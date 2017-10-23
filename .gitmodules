@@ -1,0 +1,3 @@
+[submodule "frotz"]
+	path = frotz
+	url = https://github.com/DavidGriffith/frotz.git
