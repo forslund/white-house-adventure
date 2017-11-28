@@ -14,7 +14,6 @@ def clear_until_prompt(zork):
         char = zork.stdout.read(1)
 
 def cmd(zork, action):
-    print action
     zork.stdin.write(action + '\n')
 
 def zork_read(zork):
@@ -26,14 +25,14 @@ def zork_read(zork):
 
     room = output.split('Score')[0].strip()
 
-
     # Read room info
     output = ""
     output += zork.stdout.read(1)
     while output[-1] != '>':
         output += zork.stdout.read(1)
 
-    return (room, output)
+    # Return room name and description removing the prompt
+    return (room, output[:-1])
 
 class ZorkSkill(MycroftSkill):
     def __init__(self):
@@ -48,7 +47,6 @@ class ZorkSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder('PlayZork').require('Play').require('Zork'))
     def play_zork(self, Message):
-        print self.interpreter, self.data
         if not self.zork:
             self.zork = subprocess.Popen([self.interpreter, self.data],
                                          stdin=subprocess.PIPE,
@@ -64,14 +62,20 @@ class ZorkSkill(MycroftSkill):
     def converse(self, utterance, lang):
         utterance = utterance[0]
         if self.playing:
-            if utterance == "quit" or utterance == "exit":
+            if "quit" in utterance or utterance == "exit":
+                self.speak("Leaving the mysterious kingdom of Zork")
                 self.playing = False
-                return False
+                return True
             else:
                 cmd(self.zork, utterance)
                 self.room, description = zork_read(self.zork)
-                self.speak(description, expect_response=True)
-                return True
+                if description != "":
+                    self.speak(description, expect_response=True)
+                    return True
+        return False
+
+    def stop(self, message):
+        self.playing = False
 
 
 def create_skill():
