@@ -74,7 +74,7 @@ class ZorkSkill(MycroftSkill):
                     return True
         return False
 
-    def stop(self, message):
+    def stop(self, message=None):
         self.playing = False
 
 
