@@ -1,0 +1,8 @@
+settings.py
+# compiled python
+*.pyc
+# downloaded files
+zork
+*.zip
+# vim temporary files
+.*.sw?
