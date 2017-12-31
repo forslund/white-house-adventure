@@ -77,19 +77,20 @@ class ZorkSkill(MycroftSkill):
             Pass sentence on to the frotz zork interpreter. The commands
             "quit" and "exit" will immediately exit the game.
         """
-        utterance = utterance[0]
-        if self.playing:
-            if "quit" in utterance or utterance == "exit":
-                self.speak("Leaving the mysterious kingdom of Zork")
-                self.playing = False
-                return True
-            else:
-                # Send utterance to zork interpreter and then speak response
-                cmd(self.zork, utterance)
-                self.room, description = zork_read(self.zork)
-                if description != "":
-                    self.speak(description, expect_response=True)
+        if utterance:
+            utterance = utterance[0]
+            if self.playing:
+                if "quit" in utterance or utterance == "exit":
+                    self.speak("Leaving the mysterious kingdom of Zork")
+                    self.playing = False
                     return True
+                else:
+                    # Send utterance to zork interpreter and then speak response
+                    cmd(self.zork, utterance)
+                    self.room, description = zork_read(self.zork)
+                    if description != "":
+                        self.speak(description, expect_response=True)
+                        return True
         return False
 
     def stop(self, message=None):
