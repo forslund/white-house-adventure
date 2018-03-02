@@ -1,17 +1,51 @@
 from mycroft.skills.core import MycroftSkill, intent_handler
+from mycroft.util.log import LOG
 from adapt.intent import IntentBuilder
 
 import time
 import subprocess
-from os.path import join
+from os.path import join, exists
 import sys
 
 
-def clear_until_prompt(zork):
+def save(zork, filename):
+    """
+        Save game state.
+    """
+    cmd(zork, 'save')
+    time.sleep(0.5)
+    clear_until_prompt(zork, ':')
+    cmd(zork, filename) # Accept default savegame
+    time.sleep(0.5)
+    # Check if game returns Ok or query to overwrite
+    while True:
+        char = zork.stdout.read(1)
+        if char == '.':  # Ok. (everything is done)
+            break  # The save is complete
+        if char == '?':  # Indicates an overwrite query
+            cmd(zork, 'y')  # reply yes
+
+    time.sleep(0.5)
+    clear_until_prompt(zork)
+
+
+def restore(zork, filename):
+    """
+        Restore saved game.
+    """
+    cmd(zork, 'restore')
+    time.sleep(0.5)
+    clear_until_prompt(zork, ':')
+    cmd(zork, filename)  # Accept default savegame
+    time.sleep(0.5)
+    clear_until_prompt(zork)
+
+def clear_until_prompt(zork, prompt=None):
     """ Clear all received characters until the standard prompt. """
     # Clear all data with title etecetera
+    prompt = prompt or '>'
     char = zork.stdout.read(1)
-    while char != '>':
+    while char != prompt:
         char = zork.stdout.read(1)
 
 def cmd(zork, action):
@@ -50,7 +84,7 @@ class ZorkSkill(MycroftSkill):
 
         self.interpreter = join(self._dir, 'frotz/dfrotz')
         self.data = join(self._dir, 'zork/DATA/ZORK1.DAT')
-
+        self.save_file = join(self.file_system.path, 'save.qzl')
 
     @intent_handler(IntentBuilder('PlayZork').require('Play').require('Zork'))
     def play_zork(self, Message):
@@ -63,9 +97,11 @@ class ZorkSkill(MycroftSkill):
             self.zork = subprocess.Popen([self.interpreter, self.data],
                                          stdin=subprocess.PIPE,
                                          stdout=subprocess.PIPE)
-            time.sleep(0.5)  # Allow to load
+            time.sleep(0.1)  # Allow to load
             clear_until_prompt(self.zork) # Clear initial startup messages
-
+            # Load default savegame
+            if exists(self.save_file):
+                restore(self.zork, join(self.save_file))
         # Issue look command to get initial description
         cmd(self.zork, 'look')
         self.room, description = zork_read(self.zork)
@@ -83,6 +119,8 @@ class ZorkSkill(MycroftSkill):
                 if "quit" in utterance or utterance == "exit":
                     self.speak("Leaving the mysterious kingdom of Zork")
                     self.playing = False
+                    save(self.zork, self.save_file)
+                    LOG.info('SAVE COMPLETE!')
                     return True
                 else:
                     # Send utterance to zork interpreter and then speak response
