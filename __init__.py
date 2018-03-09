@@ -4,6 +4,7 @@ from adapt.intent import IntentBuilder
 
 import time
 import subprocess
+import os
 from os.path import join, exists
 import sys
 
@@ -130,6 +131,15 @@ class ZorkSkill(MycroftSkill):
                         self.speak(description, expect_response=True)
                         return True
         return False
+
+    @intent_handler(IntentBuilder('DeleteSave').require('Delete')
+                    .require('Zork').require('Save'))
+    def delete_save(self, Message):
+        if exists(self.save_file):
+            os.remove(self.save_file)
+            self.speak_dialog('SaveDeleted')
+        else:
+            self.speak_dialog('NoSave')
 
     def stop(self, message=None):
         """
