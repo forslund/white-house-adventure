@@ -109,6 +109,12 @@ class ZorkSkill(MycroftSkill):
         self.speak(description, expect_response=True)
         self.playing = True
 
+    def leave_zork(self):
+        self.speak_dialog('LeavingZork')
+        self.playing = False
+        save(self.zork, self.save_file)
+        LOG.info('SAVE COMPLETE!')
+
     def converse(self, utterance, lang):
         """
             Pass sentence on to the frotz zork interpreter. The commands
@@ -118,10 +124,7 @@ class ZorkSkill(MycroftSkill):
             utterance = utterance[0]
             if self.playing:
                 if "quit" in utterance or utterance == "exit":
-                    self.speak("Leaving the mysterious kingdom of Zork")
-                    self.playing = False
-                    save(self.zork, self.save_file)
-                    LOG.info('SAVE COMPLETE!')
+                    self.leave_zork()
                     return True
                 else:
                     # Send utterance to zork interpreter and then speak response
@@ -145,7 +148,8 @@ class ZorkSkill(MycroftSkill):
         """
             Stop playing
         """
-        self.playing = False
+        if self.playing:
+            self.leave_zork()
 
 
 def create_skill():
