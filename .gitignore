@@ -1,4 +1,4 @@
-settings.py
+settings.json
 # compiled python
 *.pyc
 # downloaded files
