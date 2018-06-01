@@ -21,9 +21,9 @@ def save(zork, filename):
     # Check if game returns Ok or query to overwrite
     while True:
         char = zork.stdout.read(1)
-        if char == '.':  # Ok. (everything is done)
+        if char == b'.':  # Ok. (everything is done)
             break  # The save is complete
-        if char == '?':  # Indicates an overwrite query
+        if char == b'?':  # Indicates an overwrite query
             cmd(zork, 'y')  # reply yes
 
     time.sleep(0.5)
@@ -45,13 +45,15 @@ def clear_until_prompt(zork, prompt=None):
     """ Clear all received characters until the standard prompt. """
     # Clear all data with title etecetera
     prompt = prompt or '>'
-    char = zork.stdout.read(1)
+    LOG.info('Prompt is {}'.format(prompt))
+    char = zork.stdout.read(1).decode()
     while char != prompt:
-        char = zork.stdout.read(1)
+        char = zork.stdout.read(1).decode()
 
 def cmd(zork, action):
     """ Write a command to the interpreter. """
-    zork.stdin.write(action + '\n')
+    zork.stdin.write(action.encode() + b'\n')
+    zork.stdin.flush()
 
 def zork_read(zork):
     """
@@ -61,17 +63,17 @@ def zork_read(zork):
     """
     # read Room name
     output = ""
-    output += zork.stdout.read(1)
-    while output[-1] != '\n':
-        output += zork.stdout.read(1)
+    output += zork.stdout.read(1).decode()
+    while str(output)[-1] != '\n':
+        output += zork.stdout.read(1).decode()
 
     room = output.split('Score')[0].strip()
 
     # Read room info
     output = ""
-    output += zork.stdout.read(1)
+    output += zork.stdout.read(1).decode()
     while output[-1] != '>':
-        output += zork.stdout.read(1)
+        output += zork.stdout.read(1).decode()
 
     # Return room name and description removing the prompt
     return (room, output[:-1])
@@ -102,6 +104,7 @@ class ZorkSkill(MycroftSkill):
             clear_until_prompt(self.zork) # Clear initial startup messages
             # Load default savegame
             if exists(self.save_file):
+                LOG.info('Loading save game')
                 restore(self.zork, join(self.save_file))
         # Issue look command to get initial description
         cmd(self.zork, 'look')
