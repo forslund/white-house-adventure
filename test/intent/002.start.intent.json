@@ -1,0 +1,7 @@
+{
+  "utterance": "play zork",
+  "intent_type": "PlayZork",
+  "intent": {
+    "Zork": "zork"
+  }
+}
