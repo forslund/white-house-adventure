@@ -21,6 +21,7 @@ def save(zork, filename):
     # Check if game returns Ok or query to overwrite
     while True:
         char = zork.stdout.read(1)
+        time.sleep(0.01)
         if char == b'.':  # Ok. (everything is done)
             break  # The save is complete
         if char == b'?':  # Indicates an overwrite query
@@ -48,6 +49,7 @@ def clear_until_prompt(zork, prompt=None):
     LOG.info('Prompt is {}'.format(prompt))
     char = zork.stdout.read(1).decode()
     while char != prompt:
+        time.sleep(0.001)
         char = zork.stdout.read(1).decode()
 
 def cmd(zork, action):
