@@ -6,7 +6,6 @@ import time
 import subprocess
 import os
 from os.path import join, exists
-import sys
 
 
 def save(zork, filename):
@@ -16,7 +15,7 @@ def save(zork, filename):
     cmd(zork, 'save')
     time.sleep(0.5)
     clear_until_prompt(zork, ':')
-    cmd(zork, filename) # Accept default savegame
+    cmd(zork, filename)  # Accept default savegame
     time.sleep(0.5)
     # Check if game returns Ok or query to overwrite
     while True:
@@ -42,6 +41,7 @@ def restore(zork, filename):
     time.sleep(0.5)
     clear_until_prompt(zork)
 
+
 def clear_until_prompt(zork, prompt=None):
     """ Clear all received characters until the standard prompt. """
     # Clear all data with title etecetera
@@ -52,10 +52,12 @@ def clear_until_prompt(zork, prompt=None):
         time.sleep(0.001)
         char = zork.stdout.read(1).decode()
 
+
 def cmd(zork, action):
     """ Write a command to the interpreter. """
     zork.stdin.write(action.encode() + b'\n')
     zork.stdin.flush()
+
 
 def zork_read(zork):
     """
@@ -80,6 +82,7 @@ def zork_read(zork):
     # Return room name and description removing the prompt
     return (room, output[:-1])
 
+
 class ZorkSkill(MycroftSkill):
     def __init__(self):
         super(ZorkSkill, self).__init__()
@@ -103,7 +106,7 @@ class ZorkSkill(MycroftSkill):
                                          stdin=subprocess.PIPE,
                                          stdout=subprocess.PIPE)
             time.sleep(0.1)  # Allow to load
-            clear_until_prompt(self.zork) # Clear initial startup messages
+            clear_until_prompt(self.zork)  # Clear initial startup messages
             # Load default savegame
             if exists(self.save_file):
                 LOG.info('Loading save game')
@@ -132,7 +135,8 @@ class ZorkSkill(MycroftSkill):
                     self.leave_zork()
                     return True
                 else:
-                    # Send utterance to zork interpreter and then speak response
+                    # Send utterance to zork interpreter and then
+                    # speak response
                     cmd(self.zork, utterance)
                     self.room, description = zork_read(self.zork)
                     if description != "":
