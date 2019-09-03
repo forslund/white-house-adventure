@@ -87,8 +87,8 @@ class ZorkSkill(MycroftSkill):
         self.playing = False
         self.zork = None
 
-        self.interpreter = join(self._dir, 'frotz/dfrotz')
-        self.data = join(self._dir, 'zork/DATA/ZORK1.DAT')
+        self.interpreter = join(self.root_dir, 'frotz/dfrotz')
+        self.data = join(self.root_dir, 'zork/DATA/ZORK1.DAT')
         self.save_file = join(self.file_system.path, 'save.qzl')
 
     @intent_handler(IntentBuilder('PlayZork').require('Play').require('Zork'))
