@@ -1,4 +1,4 @@
-# <img src='https://rawgithub.com/FortAwesome/Font-Awesome/master/advanced-options/raw-svg/solid/door-open.svg' card_color='#00ff00' width='50' height='50' style='vertical-align:bottom'/> Zork
+# <img src='https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/door-open.svg' card_color='#00ff00' width='50' height='50' style='vertical-align:bottom'/> Zork
 Play the adventure game Zork
 
 ## About 
