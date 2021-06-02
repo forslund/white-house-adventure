@@ -123,13 +123,13 @@ class ZorkSkill(MycroftSkill):
         save(self.zork, self.save_file)
         LOG.info('SAVE COMPLETE!')
 
-    def converse(self, utterance, lang):
+    def converse(self, utterances, lang):
         """
             Pass sentence on to the frotz zork interpreter. The commands
             "quit" and "exit" will immediately exit the game.
         """
-        if utterance:
-            utterance = utterance[0]
+        if utterances:
+            utterance = utterances[0]
             if self.playing:
                 if "quit" in utterance or utterance == "exit":
                     self.leave_zork()
