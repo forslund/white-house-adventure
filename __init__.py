@@ -9,9 +9,7 @@ from os.path import join, exists
 
 
 def save(zork, filename):
-    """
-        Save game state.
-    """
+    """Save the game state."""
     cmd(zork, 'save')
     time.sleep(0.5)
     clear_until_prompt(zork, ':')
@@ -31,9 +29,7 @@ def save(zork, filename):
 
 
 def restore(zork, filename):
-    """
-        Restore saved game.
-    """
+    """Restore saved game."""
     cmd(zork, 'restore')
     time.sleep(0.5)
     clear_until_prompt(zork, ':')
@@ -43,10 +39,10 @@ def restore(zork, filename):
 
 
 def clear_until_prompt(zork, prompt=None):
-    """ Clear all received characters until the standard prompt. """
+    """Clear all received characters until the standard prompt."""
     # Clear all data with title etecetera
     prompt = prompt or '>'
-    LOG.info('Prompt is {}'.format(prompt))
+    LOG.debug('Prompt is {}'.format(prompt))
     char = zork.stdout.read(1).decode()
     while char != prompt:
         time.sleep(0.001)
@@ -54,16 +50,16 @@ def clear_until_prompt(zork, prompt=None):
 
 
 def cmd(zork, action):
-    """ Write a command to the interpreter. """
+    """Write a command to the interpreter."""
     zork.stdin.write(action.encode() + b'\n')
     zork.stdin.flush()
 
 
 def zork_read(zork):
-    """
-        Read from zork interpreter process.
+    """Read from zork interpreter process.
 
-        Returns tuple with Room name and description.
+    Returns:
+        (tuple) Room name, description.
     """
     # read Room name
     output = ""
@@ -96,9 +92,9 @@ class ZorkSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder('PlayZork').require('Play').require('Zork'))
     def play_zork(self, Message):
-        """
-            Starts zork and activates the converse part where the actual game
-            is played.
+        """Starts zork and activates the converse part.
+
+        Converse then handles the actual gameplay.
         """
         if not self.zork:
             # Start zork using frotz
@@ -109,7 +105,7 @@ class ZorkSkill(MycroftSkill):
             clear_until_prompt(self.zork)  # Clear initial startup messages
             # Load default savegame
             if exists(self.save_file):
-                LOG.info('Loading save game')
+                self.log.info('Loading save game')
                 restore(self.zork, join(self.save_file))
         # Issue look command to get initial description
         cmd(self.zork, 'look')
@@ -121,12 +117,12 @@ class ZorkSkill(MycroftSkill):
         self.speak_dialog('LeavingZork')
         self.playing = False
         save(self.zork, self.save_file)
-        LOG.info('SAVE COMPLETE!')
+        self.log.info('Zork savegame has been created')
 
     def converse(self, message):
-        """
-            Pass sentence on to the frotz zork interpreter. The commands
-            "quit" and "exit" will immediately exit the game.
+        """Pass sentence on to the frotz zork interpreter.
+
+        The commands "quit" and "exit" will immediately exit the game.
         """
         utterances = message.data['utterances']
         if utterances:
@@ -155,9 +151,7 @@ class ZorkSkill(MycroftSkill):
             self.speak_dialog('NoSave')
 
     def stop(self, message=None):
-        """
-            Stop playing
-        """
+        """Stop playing."""
         if self.playing:
             self.leave_zork()
 
