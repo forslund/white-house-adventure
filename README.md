@@ -12,6 +12,7 @@ The skill utilizes the excellent Frotz (http://frotz.sourceforge.net/) Z-Machine
 
 ## Examples 
 * "play zork"
+* "Go to the white house"
 * "quit zork"
 * "open mailbox"
 
