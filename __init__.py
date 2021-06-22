@@ -1,9 +1,9 @@
-from os.path import join
+from os.path import join, exists
 
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
 
-from .zork import ZorkInterpreter
+from .zork import ZorkInterpreter, install_zork_data
 
 
 class ZorkSkill(MycroftSkill):
@@ -14,8 +14,11 @@ class ZorkSkill(MycroftSkill):
         self.zork = None
 
         self.interpreter = join(self.root_dir, 'frotz/dfrotz')
-        self.data = join(self.root_dir, 'zork/DATA/ZORK1.DAT')
+        self.data = join(self.file_system.path, 'zork/DATA/ZORK1.DAT')
         self.save_file = join(self.file_system.path, 'save.qzl')
+        if not exists(self.data):
+            self.log('Installing Zork data to %s', self.file_system.path)
+            install_zork_data(self.file_system.path)
 
     @intent_handler(IntentBuilder('PlayZork').require('Play').require('Zork'))
     def play_zork(self, Message):

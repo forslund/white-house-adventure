@@ -1,7 +1,9 @@
 import os
 from os.path import exists, join
+import requests
 import subprocess
 import time
+import zipfile
 
 from mycroft.util.log import LOG
 
@@ -94,3 +96,22 @@ class ZorkInterpreter:
 
         # Return room name and description removing the prompt
         return (room, output[:-1])
+
+
+def install_zork_data(destination_dir):
+    """Install the zork data files in destination."""
+    zork_data_dir = join(destination_dir, 'zork')
+    try:
+        os.mkdir(zork_data_dir)
+    except FileExistsError:
+        pass
+
+    r = requests.get('http://www.infocom-if.org/downloads/zork1.zip',
+                     stream=True)
+    download_path = '/tmp/zork_data.zip'
+    with open(download_path, 'wb') as fd:
+        for chunk in r.iter_content(chunk_size=1024):
+            fd.write(chunk)
+
+    with zipfile.ZipFile(download_path, 'r') as zip_ref:
+        zip_ref.extractall(zork_data_dir)
