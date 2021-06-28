@@ -17,7 +17,7 @@ class ZorkSkill(MycroftSkill):
         self.data = join(self.file_system.path, 'zork/DATA/ZORK1.DAT')
         self.save_file = join(self.file_system.path, 'save.qzl')
         if not exists(self.data):
-            self.log('Installing Zork data to %s', self.file_system.path)
+            self.log.info('Installing Zork data to %s', self.file_system.path)
             install_zork_data(self.file_system.path)
 
     @intent_handler(IntentBuilder('PlayZork').require('Play').require('Zork'))
