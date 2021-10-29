@@ -83,7 +83,7 @@ class ZorkInterpreter:
         # read Room name
         output = ""
         output += self.zork.stdout.read(1).decode()
-        while str(output)[-1] != '\n':
+        while not output or output[-1] != '\n':
             output += self.zork.stdout.read(1).decode()
 
         room = output.split('Score')[0].strip()
@@ -94,6 +94,9 @@ class ZorkInterpreter:
         while output[-1] != '>':
             output += self.zork.stdout.read(1).decode()
 
+        #room = room.replace('\n', '')
+        #output = output[:len(room) + 1] + ". " + output[len(room) + 1:]
+        #output = output.replace('\n', '')
         # Return room name and description removing the prompt
         return (room, output[:-1])
 
